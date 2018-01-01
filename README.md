@@ -1,5 +1,5 @@
 [![GitHub release](https://img.shields.io/github/release/lbarasti/case_class.svg)](https://github.com/lbarasti/case_class/releases)
-[![Build Status](htps://travis-ci.org/lbarasti/case_class.svg?branch=master)](https://travis-ci.org/lbarasti/case_class)
+[![Build Status](https://travis-ci.org/lbarasti/case_class.svg?branch=master)](https://travis-ci.org/lbarasti/case_class)
 
 
 # case_class
@@ -22,7 +22,43 @@ dependencies:
 require "case_class"
 ```
 
-TODO: Write usage instructions here
+Defining a class with read-only fields is as easy as
+
+```crystal
+case_class Person{name : String, age : Int = 18}
+```
+Case classes also define a human readable string representation for the class
+```crystal
+p = Person.new("Rick", 28)
+puts p # prints "Person(Rick, 28)"
+```
+
+
+If you're into ADTs, then you will enjoy `case_class` support for inheritance. Here is a sample implementation for a calculator data types.
+
+```crystal
+abstract class Expr(T)
+end
+
+case_class IntExpr{value : Int32} < Expr(Int32)
+
+case_class BoolExpr{value : Bool} < Expr(Bool)
+
+case_class Add{a : Expr(Int32), b : Expr(Int32)} < Expr(Int32)
+
+case_class Eq{a : Expr(Int32), b : Expr(Int32)} < Expr(Bool)
+```
+
+## Known Limitations
+* case_class definition must have *at least* one argument. This is by design. Use `class NoArgClass; end` instead.
+* case_class definitions are body-free. If you want to define additonal methods on a case class, then just re-open the definition:
+```
+case_class YourClass{id : String}
+
+class YourClass
+  # additional methods here
+end
+```
 
 ## Development
 
