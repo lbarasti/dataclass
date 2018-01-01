@@ -2,11 +2,27 @@ require "./spec_helper"
 
 case_class Person{name : String, age : Int = 18}
 
+class A
+  def tick
+    "called_tick"
+  end
+end
+
+case_class B{id : Int32} < A
+case_class C{id : Int32}
+
 describe CaseClass do
   p = Person.new("Brian", 16)
 
   it "defines a constructor" do
     p.class.should eq(Person)
+  end
+
+  it "supports inheritance" do
+    B.new(id: 123).is_a?(A).should be_true
+    C.new(id: 123).is_a?(A).should be_false
+
+    B.new(id: 123).tick.should eq("called_tick")
   end
 
   it "defines getters for each field" do
