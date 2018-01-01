@@ -1,3 +1,7 @@
+[![GitHub release](https://img.shields.io/github/release/lbarasti/case_class.svg)](https://github.com/lbarasti/case_class/releases)
+[![Build Status](htps://travis-ci.org/lbarasti/case_class.svg?branch=master)](https://travis-ci.org/lbarasti/case_class)
+
+
 # case_class
 
 Case class macros for the Crystal Language.
