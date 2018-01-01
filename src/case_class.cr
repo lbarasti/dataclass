@@ -1,19 +1,28 @@
 require "./case_class/*"
 
 # TODO: Write documentation for `CaseClass`
-macro case_class(name)
-  class {{name.type}}
-    {% for key in name %}
+macro case_class(class_def)
+  {% if class_def.is_a?(ArrayLiteral) %}
+    {% literal = class_def %}
+    {% base_class = nil %}
+  {% elsif class_def.is_a?(Call) &&
+             class_def.name == "<" %}
+    {% literal = class_def.receiver %}
+    {% base_class = class_def.args[0] %}
+  {% end %}
+
+  class {{literal.type}} {% if base_class %} < {{base_class}} {% end %}
+    {% for key in literal %}
       getter {{key.var}}
     {% end %}
 
-    def initialize({% for key in name %}
+    def initialize({% for key in literal %}
       @{{key}},
     {% end %})
     end
 
     def to_s(io)
-      fields = [{% for key in name %}@{{key.var}},{% end %}]
+      fields = [{% for key in literal %}@{{key.var}},{% end %}]
       io << "#{self.class}(#{fields.join(", ")})"
     end
   end
