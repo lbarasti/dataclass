@@ -1,0 +1,12 @@
+name: case_class
+version: 0.0.1-rc1
+
+authors:
+  - lbarasti
+
+description: |
+  Case class macros for the Crystal Language.
+
+crystal: 0.24.1
+
+license: MIT
