@@ -21,6 +21,12 @@ macro case_class(class_def)
     {% end %})
     end
 
+    def ==(other : {{literal.type}})
+      {% for key, idx in literal %}
+        {{key.var}} == other.{{key.var}} {% if idx < literal.size - 1 %} && {% end %}
+      {% end %}
+    end
+
     def to_s(io)
       fields = [{% for key in literal %}@{{key.var}},{% end %}]
       io << "#{self.class}(#{fields.join(", ")})"
