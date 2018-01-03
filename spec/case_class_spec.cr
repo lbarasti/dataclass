@@ -10,6 +10,7 @@ end
 
 case_class B{id : Int32} < A
 case_class C{id : Int32}
+case_class Compound{id : String, b : B, c : C}
 
 describe CaseClass do
   p = Person.new("Brian", 16)
@@ -42,5 +43,29 @@ describe CaseClass do
 
   it "defines a human friendly to_s method" do
     p.to_s.should eq("Person(Brian, 16)")
+  end
+
+  it "defines equality as structural comparison" do
+    p.should eq(Person.new(p.name, p.age))
+  end
+
+  it "supports comparison of nested structures" do
+    a = Compound.new("an-id", B.new(42), C.new(2))
+    b = Compound.new("an-id", B.new(42), C.new(2))
+    a.should eq(b)
+  end
+
+  it "supports basic case matching" do
+    case p
+    when Person
+      # do nothing
+    else fail("should have matched the above")
+    end
+
+    case p
+    when Person.new(p.name, p.age)
+      # do nothing
+    else fail("should have matched the above")
+    end
   end
 end
