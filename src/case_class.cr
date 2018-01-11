@@ -27,6 +27,26 @@ macro case_class(class_def)
       {% end %}
     end
 
+    def [](idx)
+      [
+        {% for key, idx in literal %}
+          @{{key.var}},
+        {% end %}
+      ][idx]
+    end
+
+    def to_tuple
+      {% for key, idx in literal %}
+        temp_{{idx}} = {{key.var}}
+      {% end %}
+
+      { \
+        {% for key, idx in literal %}
+          temp_{{idx}}.responds_to?(:to_tuple) ? temp_{{idx}}.to_tuple : temp_{{idx}} {% if idx < literal.size - 1 %}, {% end %} \
+        {% end %}
+      }
+    end
+
     def to_s(io)
       fields = [{% for key in literal %}@{{key.var}},{% end %}]
       io << "#{self.class}(#{fields.join(", ")})"
