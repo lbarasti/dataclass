@@ -14,7 +14,7 @@ case_class Compound{id : String, b : B, c : C}
 
 describe CaseClass do
   p = Person.new("Brian", 16)
-
+  comp = Compound.new("an-id", B.new(42), C.new(2))
   it "defines a constructor" do
     p.class.should eq(Person)
   end
@@ -36,6 +36,33 @@ describe CaseClass do
     p_with_default_age.age.should eq(18)
   end
 
+  it "supports destructuring assignment" do
+    name, age = p
+    name.should eq(p.name)
+    age.should eq(p.age)
+
+    name, _ = p
+    name.should eq(p.name)
+  end
+
+  it "supports destructuring assignment on nested case classes" do
+    _, b, c = comp
+    b.should eq(comp.b)
+    c.should eq(comp.c)
+
+    id, _, c = comp
+    id.should eq(comp.id)
+    c.should eq(comp.c)
+  end
+
+  it "supports conversion to tuple" do
+    p.to_tuple.should eq({p.name, p.age})
+  end
+
+  it "recursively calls to_tuple on nested case classes" do
+    comp.to_tuple.should eq({comp.id, {comp.b.id}, {comp.c.id}})
+  end
+
   it "does not define setters" do
     p.responds_to?(:"name=").should eq(false)
     p.responds_to?(:"age=").should eq(false)
@@ -50,9 +77,11 @@ describe CaseClass do
   end
 
   it "supports comparison of nested structures" do
-    a = Compound.new("an-id", B.new(42), C.new(2))
-    b = Compound.new("an-id", B.new(42), C.new(2))
-    a.should eq(b)
+    b = Compound.new(comp.id, comp.b, comp.c)
+    comp.should eq(b)
+
+    different = Compound.new("other-id", B.new(42), C.new(2))
+    comp.should_not eq(different)
   end
 
   it "supports basic case matching" do
