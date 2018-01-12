@@ -31,6 +31,20 @@ describe CaseClass do
     p.age.should eq(16)
   end
 
+  it "provides a copy constructor" do
+    john = p.copy(name: "John")
+    john.name.should eq("John")
+    john.age.should eq(p.age)
+
+    john.copy(age: 1).age.should eq(1)
+  end
+
+  it "provides a copy constructor that does not have side effects on the caller" do
+    name, age = p.to_tuple
+    john = p.copy(name: "John")
+    p.should eq(Person.new(name, age))
+  end
+
   it "supports default params" do
     p_with_default_age = Person.new("Brian")
     p_with_default_age.age.should eq(18)

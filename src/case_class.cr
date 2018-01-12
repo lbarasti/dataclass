@@ -27,6 +27,10 @@ macro case_class(class_def)
       {% end %}
     end
 
+    def copy({% for key in literal %}{{key.var}} = @{{key.var}},{% end %}) : {{literal.type}}
+      {{literal.type}}.new({% for key in literal %}{{key.var}},{% end %})
+    end
+
     def [](idx)
       [
         {% for key, idx in literal %}
