@@ -55,5 +55,10 @@ macro case_class(class_def)
         \{{ {{key.var}}_pattern }} = rhs_{{key.var}}
       {% end %}
     end
+
+    macro inherited
+      \{% raise "Illegal inheritance: case classes cannot be inherited from.\n" +
+        "Define an abstract class and have both '#{@type}' and '#{{{literal.type}}}' inherit from that, instead." %}
+    end
   end
 end
