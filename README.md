@@ -32,6 +32,11 @@ Case classes also define a human readable string representation for the class
 p = Person.new("Rick", 28)
 puts p # prints "Person(Rick, 28)"
 ```
+Instances of a case class are immutable. A `copy` method is provided to build new versions of a given object
+```crystal
+p.copy(age: p.age + 1) # => Person(Rick, 29)
+```
+
 
 ### Pattern-based parameter extraction
 Case classes enable you to extract parameters using some sort of pattern matching. This is powered by an custom definition of the `[]=` operator on the case class itself.
@@ -57,6 +62,10 @@ age == profile.person.age # => true
 postcode == profile.address.postcode # => true
 ```
 
+Note that it is necessary for the variables used in the pattern matching to be initialized *before* they appear in the pattern.
+
+Skipping the initialization step will produce a compilation error as soon as you try to reuse such variables.
+
 ### Case classes and ADTs
 
 If you're into ADTs, then you will enjoy `case_class` support for inheritance. Here is a sample implementation for a calculator data types.
@@ -74,7 +83,7 @@ case_class Add{a : Expr(Int32), b : Expr(Int32)} < Expr(Int32)
 case_class Eq{a : Expr(Int32), b : Expr(Int32)} < Expr(Bool)
 ```
 
-## Known Limitations
+### Known Limitations
 * case_class definition must have *at least* one argument. This is by design. Use `class NoArgClass; end` instead.
 * case_class definitions are body-free. If you want to define additonal methods on a case class, then just re-open the definition:
 ```
