@@ -1,6 +1,8 @@
 require "./spec_helper"
 
 case_class Person{name : String, age : Int = 18}
+case_class Address{line1 : String, postcode : String}
+case_class Profile{person : Person, address : Address}
 
 class A
   def tick
@@ -14,7 +16,10 @@ case_class Compound{id : String, b : B, c : C}
 
 describe CaseClass do
   p = Person.new("Brian", 16)
+  address = Address.new("10 Strand", "EC1")
+  profile = Profile.new(p, address)
   comp = Compound.new("an-id", B.new(42), C.new(2))
+
   it "defines a constructor" do
     p.class.should eq(Person)
   end
@@ -73,8 +78,8 @@ describe CaseClass do
     p.to_tuple.should eq({p.name, p.age})
   end
 
-  it "recursively calls to_tuple on nested case classes" do
-    comp.to_tuple.should eq({comp.id, {comp.b.id}, {comp.c.id}})
+  it "to_tuple on nested case classes does not get called recursively" do
+    comp.to_tuple.should eq({comp.id, comp.b, comp.c})
   end
 
   it "does not define setters" do
@@ -96,6 +101,28 @@ describe CaseClass do
 
     different = Compound.new("other-id", B.new(42), C.new(2))
     comp.should_not eq(different)
+  end
+
+  it "supports pattern-based parameter extraction" do
+    a, b = nil, nil
+    Person[a, b] = p
+    a.should eq(p.name)
+    b.should eq(p.age)
+  end
+
+  it "supports nested pattern-based parameter extraction" do
+    a, b, c, d = nil, nil, nil, nil
+    Profile[Person[a, b], Address[c, d]] = profile
+    a.should eq(profile.person.name)
+    b.should eq(profile.person.age)
+    c.should eq(profile.address.line1)
+    d.should eq(profile.address.postcode)
+  end
+
+  it "supports underscore in pattern-based parameter extraction" do
+    line1 = nil
+    Profile[_, Address[line1, _]] = profile
+    line1.should eq(profile.address.line1)
   end
 
   it "supports basic case matching" do

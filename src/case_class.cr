@@ -40,13 +40,9 @@ macro case_class(class_def)
     end
 
     def to_tuple
-      {% for key, idx in literal %}
-        temp_{{idx}} = {{key.var}}
-      {% end %}
-
       { \
         {% for key, idx in literal %}
-          temp_{{idx}}.responds_to?(:to_tuple) ? temp_{{idx}}.to_tuple : temp_{{idx}} {% if idx < literal.size - 1 %}, {% end %} \
+          @{{key.var}} {% if idx < literal.size - 1 %}, {% end %} \
         {% end %}
       }
     end
@@ -54,6 +50,14 @@ macro case_class(class_def)
     def to_s(io)
       fields = [{% for key in literal %}@{{key.var}},{% end %}]
       io << "#{self.class}(#{fields.join(", ")})"
+    end
+
+    macro []=({% for key, idx in literal %}{{key.var}}_pattern,{% end %} rhs)
+      {% for key, idx in literal %}rhs_{{key.var}}{% if idx < literal.size - 1 %}, {% end %}{% end %} = \{{rhs}}.to_tuple
+
+      {% for key, idx in literal %}
+        \{{ {{key.var}}_pattern }} = rhs_{{key.var}}
+      {% end %}
     end
   end
 end
