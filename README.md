@@ -33,6 +33,31 @@ p = Person.new("Rick", 28)
 puts p # prints "Person(Rick, 28)"
 ```
 
+### Pattern-based parameter extraction
+Case classes enable you to extract parameters using some sort of pattern matching. This is powered by an custom definition of the `[]=` operator on the case class itself.
+
+For example, given the case classes
+
+```crystal
+case_class Person{name : String, age : Int = 18}
+case_class Address{line1 : String, postcode : String}
+case_class Profile{person : Person, address : Address}
+```
+
+and a `Profile` instance `profile`
+```crystal
+profile = Profile.new(Person.new("Alice", 43), Address.new("10 Strand", "EC1"))
+```
+
+the following is supported
+```
+age, postcode = nil, nil
+Profile[Person[_, age], Address[_, postcode]] = profile
+age == profile.person.age # => true
+postcode == profile.address.postcode # => true
+```
+
+### Case classes and ADTs
 
 If you're into ADTs, then you will enjoy `case_class` support for inheritance. Here is a sample implementation for a calculator data types.
 
