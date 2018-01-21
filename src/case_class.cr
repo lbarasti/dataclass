@@ -21,11 +21,7 @@ macro case_class(class_def)
     {% end %})
     end
 
-    def ==(other : {{literal.type}})
-      {% for key, idx in literal %}
-        {{key.var}} == other.{{key.var}} {% if idx < literal.size - 1 %} && {% end %}
-      {% end %}
-    end
+    def_equals_and_hash({% for key in literal %}@{{key.var}},{% end %})
 
     def copy({% for key in literal %}{{key.var}} = @{{key.var}},{% end %}) : {{literal.type}}
       {{literal.type}}.new({% for key in literal %}{{key.var}},{% end %})

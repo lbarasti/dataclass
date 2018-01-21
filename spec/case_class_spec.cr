@@ -95,6 +95,11 @@ describe CaseClass do
     p.should eq(Person.new(p.name, p.age))
   end
 
+  it "defines #hash based on the instance fields" do
+    p1 = Person.new(p.name, p.age)
+    p.hash.should eq(p1.hash)
+  end
+
   it "supports comparison of nested structures" do
     b = Compound.new(comp.id, comp.b, comp.c)
     comp.should eq(b)
