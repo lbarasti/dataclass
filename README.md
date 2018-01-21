@@ -4,7 +4,7 @@
 
 # case_class
 
-Case class macros for the Crystal Language.
+The `case_class` macro defines a class whose instances are immutable and provide a natural implementation for the most common methods. It also defines some basic pattern matching functionality, to ease data extraction.
 
 ## Installation
 
@@ -22,24 +22,54 @@ dependencies:
 require "case_class"
 ```
 
-Defining a class with read-only fields is as easy as
+Let's define a class with read-only fields
 
 ```crystal
 case_class Person{name : String, age : Int = 18}
 ```
-Case classes also define a human readable string representation for the class
+
+We can now create instances and access fields
+
 ```crystal
 p = Person.new("Rick", 28)
+
+p.name # => "Rick"
+p.age # => 28
+```
+
+The equality operator is defined to perform structural comparison
+
+```crystal
+q = Person.new("Rick", 28)
+
+p == q # => true
+```
+
+The `hash` method is defined accordingly. This guarantees predictable behaviour with Set and Hash.
+
+```crystal
+  visitors = Set(Person).new
+  visitors << p
+  visitors << q
+
+  visitors.size # => 1
+ ```
+
+`to_s` is also defined to provide a human readable string representation for a case class instance
+
+```crystal
 puts p # prints "Person(Rick, 28)"
 ```
+
 Instances of a case class are immutable. A `copy` method is provided to build new versions of a given object
+
 ```crystal
 p.copy(age: p.age + 1) # => Person(Rick, 29)
 ```
 
 
 ### Pattern-based parameter extraction
-Case classes enable you to extract parameters using some sort of pattern matching. This is powered by an custom definition of the `[]=` operator on the case class itself.
+Case classes enable you to extract parameters using some sort of pattern matching. This is powered by a custom definition of the `[]=` operator on the case class itself.
 
 For example, given the case classes
 
@@ -50,14 +80,17 @@ case_class Profile{person : Person, address : Address}
 ```
 
 and a `Profile` instance `profile`
+
 ```crystal
 profile = Profile.new(Person.new("Alice", 43), Address.new("10 Strand", "EC1"))
 ```
 
 the following is supported
+
 ```
 age, postcode = nil, nil
 Profile[Person[_, age], Address[_, postcode]] = profile
+
 age == profile.person.age # => true
 postcode == profile.address.postcode # => true
 ```
@@ -86,6 +119,7 @@ case_class Eq{a : Expr(Int32), b : Expr(Int32)} < Expr(Bool)
 ### Known Limitations
 * case_class definition must have *at least* one argument. This is by design. Use `class NoArgClass; end` instead.
 * case_class definitions are body-free. If you want to define additonal methods on a case class, then just re-open the definition:
+
 ```
 case_class YourClass{id : String}
 
