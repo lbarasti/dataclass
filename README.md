@@ -144,9 +144,15 @@ case_class Eq{a : Expr(Int32), b : Expr(Int32)} < Expr(Bool)
 
 ### Known Limitations
 * case_class definition must have *at least* one argument. This is by design. Use `class NoArgClass; end` instead.
+* trying to inherit from a case class will lead to a compilation error.
+```crystal
+case_class A{id : String}
+case_class B{id : String, extra : Int32} < A # => won't compile
+```
+This is by design. Try defining your case classes so that they [inherit from a commmon abstract class](https://stackoverflow.com/a/12706475) instead.
 * case_class definitions are body-free. If you want to define additonal methods on a case class, then just re-open the definition:
 
-```
+```crystal
 case_class YourClass{id : String}
 
 class YourClass
