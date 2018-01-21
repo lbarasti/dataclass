@@ -87,7 +87,7 @@ profile = Profile.new(Person.new("Alice", 43), Address.new("10 Strand", "EC1"))
 
 the following is supported
 
-```
+```crystal
 age, postcode = nil, nil
 Profile[Person[_, age], Address[_, postcode]] = profile
 
@@ -98,6 +98,31 @@ postcode == profile.address.postcode # => true
 Note that it is necessary for the variables used in the pattern matching to be initialized *before* they appear in the pattern.
 
 Skipping the initialization step will produce a compilation error as soon as you try to reuse such variables.
+
+
+### Destructuring assignment
+Case classes support destructuring assignment. There is no magic involved here: case classes simply implement the indexing operator `#[](idx)`.
+
+```crystal
+person, address = profile
+
+person == profile.person # => true
+address == profile.address # => true
+```
+
+The inconvenience with this approach is that the type of both `person` and `address` at compile time is going to be `String | Int32`. This might make your code a bit uglier than it needs to be.
+
+To circumvent this limitation, the `to_tuple` method is also provided. This assigns the right type to each extracted parameter even at compile-time
+
+```crystal
+profile.to_tuple # => {Person(...), Address(...)}
+
+person, address = profile.to_tuple
+
+person == profile.person # => true
+address == profile.address # => true
+```
+
 
 ### Case classes and ADTs
 
@@ -115,6 +140,7 @@ case_class Add{a : Expr(Int32), b : Expr(Int32)} < Expr(Int32)
 
 case_class Eq{a : Expr(Int32), b : Expr(Int32)} < Expr(Bool)
 ```
+
 
 ### Known Limitations
 * case_class definition must have *at least* one argument. This is by design. Use `class NoArgClass; end` instead.
