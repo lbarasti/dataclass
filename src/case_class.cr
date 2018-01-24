@@ -43,6 +43,12 @@ macro case_class(class_def)
       }
     end
 
+    def self.to_tuple(obj) # : Nil | { {% for key, idx in literal %}{{key.type}} {% if idx < literal.size - 1 %}, {% end %}{% end %} }
+      if(obj.is_a?({{literal.type}}))
+        obj.to_tuple
+      else nil; end
+    end
+
     def to_s(io)
       fields = [{% for key in literal %}@{{key.var}},{% end %}]
       io << "#{self.class}(#{fields.join(", ")})"
@@ -50,26 +56,34 @@ macro case_class(class_def)
 
     macro []=({% for key, idx in literal %}{{key.var}}_pattern,{% end %} rhs)
       begin
-      {% for key, idx in literal %}%rhs_{idx}{% if idx < literal.size - 1 %}, {% end %}{% end %} = \{{rhs}}.to_tuple
+        %extracted = {{literal.type}}.to_tuple(\{{rhs}})
 
-      %is_match = true
+        if %extracted
+          {% if literal.size == 1 %}
+            %rhs_{0} = %extracted[0]
+          {% else %}
+            {% for key, idx in literal %}%rhs_{idx}{% if idx < literal.size - 1 %}, {% end %}{% end %} = %extracted
+          {% end %}
 
-      {% for key, idx in literal %}
-        \{% if {{key.var}}_pattern.class_name == "Underscore" %}
-        \{% elsif {{key.var}}_pattern.class_name == "Var" %}
-          \{{ {{key.var}}_pattern }} = %rhs_{idx}
-        \{% elsif {{key.var}}_pattern.class_name == "Call" %}
-          \{% if {{key.var}}_pattern.name == "`" %}
-            %is_match = %is_match && \{{ {{key.var}}_pattern.args[0].id }} === %rhs_{idx}
-          \{% else %}
-            %is_match = %is_match && (\{{ {{key.var}}_pattern }} = %rhs_{idx})
-          \{% end %}
-        \{% else %}
-          %is_match = %is_match && \{{ {{key.var}}_pattern }} === %rhs_{idx}
-        \{% end %}
-      {% end %}
+          %is_match = true
 
-      %is_match
+          {% for key, idx in literal %}
+            \{% if {{key.var}}_pattern.class_name == "Underscore" %}
+            \{% elsif {{key.var}}_pattern.class_name == "Var" %}
+              \{{ {{key.var}}_pattern }} = %rhs_{idx}
+            \{% elsif {{key.var}}_pattern.class_name == "Call" %}
+              \{% if {{key.var}}_pattern.name == "`" %}
+                %is_match = %is_match && \{{ {{key.var}}_pattern.args[0].id }} === %rhs_{idx}
+              \{% else %}
+                %is_match = %is_match && (\{{ {{key.var}}_pattern }} = %rhs_{idx})
+              \{% end %}
+            \{% else %}
+              %is_match = %is_match && \{{ {{key.var}}_pattern }} === %rhs_{idx}
+            \{% end %}
+          {% end %}
+
+          %is_match
+        end
       end
     end
 

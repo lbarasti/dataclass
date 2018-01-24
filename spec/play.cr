@@ -16,17 +16,20 @@ macro match(cs)
   {% for pattern, idx in cs.whens %}
     {% if idx == 0 %} if {% elsif idx < cs.whens.size %} elsif {% end %} {{pattern.conds[0]}} = {{cs.cond}}
       postpone ({{pattern.body}})
-    {% if idx == cs.whens.size - 1 %} end {% end %}
+    {% if idx == cs.whens.size - 1 %}
+      {% if cs.else %} else {{cs.else}} {% end %}
+      end
+    {% end %}
   {% end %}
 end
 
-a = address.line1
+line = address.line1
 
 match case p
-  when Person[_, Address[`a`, postcode]]
-    p [[a,postcode]]
-  when Person[String, Address[_, postcode]]
-    puts 3
+when Person[_, Address[`line`, postcode]]
+  p [[line, postcode]]
+when Person[String, Address[_, postcode]]
+  puts 3
 end
 
 abstract class Expr(T)
@@ -42,11 +45,28 @@ case_class Eq{a : Expr(Int32), b : Expr(Int32)} < Expr(Bool)
 
 expr = Eq.new(Add.new(IntExpr.new(2), IntExpr.new(3)), IntExpr.new(5))
 
-gg,hh = {expr.a, expr.b}
-ff,jj = gg.a, gg.b
-puts ff,jj, gg.to_tuple.class
+match case expr
+when Eq[Add[a, b], IntExpr[_]]
+  puts(a, b)
+end
 
-# match case expr
-#   when Eq[Add[a,b], c]
-#     puts a
-# end
+def eval(expr : Expr(Int32) | Nil) : Int32
+  if expr.nil?
+    42
+  else
+    match case expr
+    when Add[a, b]
+      eval(a) + eval(b)
+    when IntExpr[a]
+      a.as(Int32)
+    else 42
+    end
+  end
+end
+
+result = match case expr
+when Eq[a, b]
+  eval(a)
+end
+
+puts result
