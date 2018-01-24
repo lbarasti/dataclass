@@ -49,11 +49,28 @@ macro case_class(class_def)
     end
 
     macro []=({% for key, idx in literal %}{{key.var}}_pattern,{% end %} rhs)
-      {% for key, idx in literal %}rhs_{{key.var}}{% if idx < literal.size - 1 %}, {% end %}{% end %} = \{{rhs}}.to_tuple
+      begin
+      {% for key, idx in literal %}%rhs_{idx}{% if idx < literal.size - 1 %}, {% end %}{% end %} = \{{rhs}}.to_tuple
+
+      %is_match = true
 
       {% for key, idx in literal %}
-        \{{ {{key.var}}_pattern }} = rhs_{{key.var}}
+        \{% if {{key.var}}_pattern.class_name == "Underscore" %}
+        \{% elsif {{key.var}}_pattern.class_name == "Var" %}
+          \{{ {{key.var}}_pattern }} = %rhs_{idx}
+        \{% elsif {{key.var}}_pattern.class_name == "Call" %}
+          \{% if {{key.var}}_pattern.name == "`" %}
+            %is_match = %is_match && \{{ {{key.var}}_pattern.args[0].id }} === %rhs_{idx}
+          \{% else %}
+            %is_match = %is_match && (\{{ {{key.var}}_pattern }} = %rhs_{idx})
+          \{% end %}
+        \{% else %}
+          %is_match = %is_match && \{{ {{key.var}}_pattern }} === %rhs_{idx}
+        \{% end %}
       {% end %}
+
+      %is_match
+      end
     end
 
     macro inherited
