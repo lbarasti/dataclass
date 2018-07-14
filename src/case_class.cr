@@ -69,11 +69,11 @@ macro case_class(class_def)
 
           {% for key, idx in literal %}
             \{% if {{key.var}}_pattern.class_name == "Underscore" %}
-            \{% elsif {{key.var}}_pattern.class_name == "Var" %}
-              \{{ {{key.var}}_pattern }} = %rhs_{idx}
             \{% elsif {{key.var}}_pattern.class_name == "Call" %}
               \{% if {{key.var}}_pattern.name == "`" %}
                 %is_match = %is_match && \{{ {{key.var}}_pattern.args[0].id }} === %rhs_{idx}
+              \{% elsif {{key.var}}_pattern.args.size == 0 %}
+                \{{ {{key.var}}_pattern }} = %rhs_{idx}
               \{% else %}
                 %is_match = %is_match && (\{{ {{key.var}}_pattern }} = %rhs_{idx})
               \{% end %}
