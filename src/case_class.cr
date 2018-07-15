@@ -59,10 +59,8 @@ macro case_class(class_def)
         %extracted = {{literal.type}}.to_tuple(\{{rhs}})
 
         if %extracted
-          {% if literal.size == 1 %}
-            %rhs_{0} = %extracted[0]
-          {% else %}
-            {% for key, idx in literal %}%rhs_{idx}{% if idx < literal.size - 1 %}, {% end %}{% end %} = %extracted
+          {% for key, idx in literal %}
+            %rhs_{idx} = %extracted[{{idx}}]
           {% end %}
 
           %is_match = true
