@@ -43,6 +43,14 @@ macro case_class(class_def)
       }
     end
 
+    def to_named_tuple
+      { \
+        {% for key, idx in literal %}
+          "{{key.var}}": @{{key.var}} {% if idx < literal.size - 1 %}, {% end %} \
+        {% end %}
+      }
+    end
+
     def to_s(io)
       fields = [{% for key in literal %}@{{key.var}},{% end %}]
       io << "#{self.class}(#{fields.join(", ")})"

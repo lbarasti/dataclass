@@ -82,6 +82,14 @@ describe CaseClass do
     comp.to_tuple.should eq({comp.id, comp.b, comp.c})
   end
 
+  it "supports conversion to named tuple" do
+    p.to_named_tuple.should eq({"name": p.name, "age": p.age})
+  end
+
+  it "to_named_tuple on nested case classes does not get called recursively" do
+    comp.to_named_tuple.should eq({"id": comp.id, "b": comp.b, "c": comp.c})
+  end
+
   it "does not define setters" do
     p.responds_to?(:"name=").should eq(false)
     p.responds_to?(:"age=").should eq(false)
