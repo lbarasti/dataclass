@@ -123,22 +123,20 @@ person == profile.person # => true
 address == profile.address # => true
 ```
 
-
-### Case classes and ADTs
-
-If you're into ADTs, then you will enjoy `case_class` support for inheritance. Here is a sample implementation for a calculator data types.
+The macro also defines a `to_named_tuple` method, which provides a natural transformation of your case class instance to `NamedTuple`
 
 ```crystal
-abstract class Expr(T)
-end
+  person.to_named_tuple # => {"name": "Alice", "age": 43}
+```
+Mind that, by design, both `to_tuple` and `to_named_tuple` are not recursive - so they will not convert case class fields to tuples / named tuples respectively.
 
-case_class IntExpr{value : Int32} < Expr(Int32)
+### Support for inheritance
 
-case_class BoolExpr{value : Bool} < Expr(Bool)
+The `case_class` macro supports inheritance, so the following code is valid
 
-case_class Add{a : Expr(Int32), b : Expr(Int32)} < Expr(Int32)
-
-case_class Eq{a : Expr(Int32), b : Expr(Int32)} < Expr(Bool)
+```crystal
+class Vehicle
+case_class Car{passengers : Int16} < Vehicle
 ```
 
 
