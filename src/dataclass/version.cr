@@ -1,4 +1,4 @@
-module CaseClass
+module DataClass
   VERSION = File.read_lines(
     File.join(
       File.dirname(__FILE__), "..", "..", "shard.yml"))

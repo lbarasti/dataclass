@@ -1,7 +1,6 @@
-require "./case_class/*"
+require "./dataclass/*"
 
-# TODO: Write documentation for `CaseClass`
-macro case_class(class_def)
+macro dataclass(class_def)
   {% if class_def.is_a?(ArrayLiteral) %}
     {% literal = class_def %}
     {% base_class = nil %}

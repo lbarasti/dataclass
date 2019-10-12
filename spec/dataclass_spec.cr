@@ -1,8 +1,8 @@
 require "./spec_helper"
 
-case_class Person{name : String, age : Int = 18}
-case_class Address{line1 : String, postcode : String}
-case_class Profile{person : Person, address : Address}
+dataclass Person{name : String, age : Int = 18}
+dataclass Address{line1 : String, postcode : String}
+dataclass Profile{person : Person, address : Address}
 
 class A
   def tick
@@ -10,11 +10,11 @@ class A
   end
 end
 
-case_class B{id : Int32} < A
-case_class C{id : Int32}
-case_class Compound{id : String, b : B, c : C}
+dataclass B{id : Int32} < A
+dataclass C{id : Int32}
+dataclass Compound{id : String, b : B, c : C}
 
-describe CaseClass do
+describe DataClass do
   p = Person.new("Brian", 16)
   address = Address.new("10 Strand", "EC1")
   profile = Profile.new(p, address)
@@ -64,7 +64,7 @@ describe CaseClass do
     name.should eq(p.name)
   end
 
-  it "supports destructuring assignment on nested case classes" do
+  it "supports destructuring assignment on nested data classes" do
     _, b, c = comp
     b.should eq(comp.b)
     c.should eq(comp.c)
@@ -78,7 +78,7 @@ describe CaseClass do
     p.to_tuple.should eq({p.name, p.age})
   end
 
-  it "to_tuple on nested case classes does not get called recursively" do
+  it "to_tuple on nested data classes does not get called recursively" do
     comp.to_tuple.should eq({comp.id, comp.b, comp.c})
   end
 
@@ -86,7 +86,7 @@ describe CaseClass do
     p.to_named_tuple.should eq({"name": p.name, "age": p.age})
   end
 
-  it "to_named_tuple on nested case classes does not get called recursively" do
+  it "to_named_tuple on nested data classes does not get called recursively" do
     comp.to_named_tuple.should eq({"id": comp.id, "b": comp.b, "c": comp.c})
   end
 
