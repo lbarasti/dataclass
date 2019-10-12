@@ -51,8 +51,14 @@ macro dataclass(class_def)
     end
 
     def to_s(io)
-      fields = [{% for key in literal %}@{{key.var}},{% end %}]
-      io << "#{self.class}(#{fields.join(", ")})"
+      io << "#{self.class}("
+      {% for key, idx in literal %}
+        io << @{{key.var}}
+        {% if idx < literal.size - 1 %}
+          io << ", "
+        {% end %}
+      {% end %}
+      io << ")"
     end
 
     macro []=({% for key, idx in literal %}{{key.var}}_pattern,{% end %} rhs)
@@ -65,7 +71,7 @@ macro dataclass(class_def)
 
     macro inherited
       \{% raise "Illegal inheritance: case classes cannot be inherited from.\n" +
-        "Define an abstract class and have both '#{@type}' and '#{{{literal.type}}}' inherit from that, instead." %}
+        "Define an abstract class and have both '#{@type}' and '{{literal.type}}' inherit from that, instead." %}
     end
   end
 end
