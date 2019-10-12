@@ -129,16 +129,26 @@ address == profile.address # => true
 If you're into ADTs, then you will enjoy `case_class` support for inheritance. Here is a sample implementation for a calculator data types.
 
 ```crystal
-abstract class Expr(T)
+abstract class Expr
 end
 
-case_class IntExpr{value : Int32} < Expr(Int32)
+case_class IntExpr{value : Int32} < Expr
 
-case_class BoolExpr{value : Bool} < Expr(Bool)
+case_class Add{a : Expr, b : Expr} < Expr
 
-case_class Add{a : Expr(Int32), b : Expr(Int32)} < Expr(Int32)
+case_class Mult{a : Expr, b : Expr} < Expr
 
-case_class Eq{a : Expr(Int32), b : Expr(Int32)} < Expr(Bool)
+def eval(expr : Add)
+  eval(expr.a) + eval(expr.b)
+end
+
+def eval(expr : IntExpr)
+  expr.value
+end
+
+def eval(expr : Mult)
+  eval(expr.a) * eval(expr.b)
+end
 ```
 
 
