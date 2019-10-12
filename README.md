@@ -1,10 +1,15 @@
 [![GitHub release](https://img.shields.io/github/release/lbarasti/dataclass.svg)](https://github.com/lbarasti/dataclass/releases)
 [![Build Status](https://travis-ci.org/lbarasti/dataclass.svg?branch=master)](https://travis-ci.org/lbarasti/dataclass)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 
 # dataclass
+A [Crystal](http://crystal-lang.org/) macro to ease the definition of *data classes*, i.e. classes whose main purpose is to hold data.
 
-The `dataclass` macro defines a class whose instances are immutable and provide a natural implementation for the most common methods. It also defines some basic pattern matching functionality, to ease data extraction.
+Data class instances are immutable, and provide a natural implementation for the most common methods.
+They also define some basic pattern matching functionality, to ease data extraction.
+
+Follow the links to read more about data classes in [Kotlin](https://kotlinlang.org/docs/reference/data-classes.html), [Scala](https://docs.scala-lang.org/tour/case-classes.html) and [Python](https://docs.python.org/3/library/dataclasses.html).
 
 ## Installation
 
