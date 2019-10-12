@@ -1,2 +1,2 @@
 require "spec"
-require "../src/case_class"
+require "../src/dataclass"
