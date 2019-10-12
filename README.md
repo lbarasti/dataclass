@@ -135,10 +135,47 @@ Mind that, by design, both `to_tuple` and `to_named_tuple` are not recursive - s
 The `dataclass` macro supports inheritance, so the following code is valid
 
 ```crystal
-class Vehicle
+class Vehicle; end
 dataclass Car{passengers : Int16} < Vehicle
 ```
 
+### Support for type parameters
+
+The `dataclass` macro supports type parameters, so the following code is valid
+
+```crystal
+dataclass Wrapper(T){value : T}
+```
+
+### Under the hood
+The expression `dataclass Person{name : String, age : Int = 18}` is equivalent to the following:
+```crystal
+class Person
+  getter(name)
+  getter(age)
+  def initialize(name : String, age : Int = 18)
+    @name = name
+    @age = age
+  end
+  def_equals_and_hash(@name, @age)
+  def copy(name = @name, age = @age) : Person
+    Person.new(name, age)
+  end
+  def [](idx)
+    [@name, @age][idx]
+  end
+  def to_tuple
+    {@name, @age}
+  end
+  def to_named_tuple
+    {name: @name, age: @age}
+  end
+  def to_s(io)
+    fields = [@name, @age]
+    io << "#{self.class}(#{fields.join(", ")})"
+  end
+end
+```
 
 ### Known Limitations
 * dataclass definition must have *at least* one argument. This is by design. Use `class NoArgClass; end` instead.

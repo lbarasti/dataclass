@@ -14,6 +14,8 @@ dataclass B{id : Int32} < A
 dataclass C{id : Int32}
 dataclass Compound{id : String, b : B, c : C}
 
+dataclass WithTypeParam(T){field : T}
+
 describe DataClass do
   p = Person.new("Brian", 16)
   address = Address.new("10 Strand", "EC1")
@@ -29,6 +31,14 @@ describe DataClass do
     C.new(id: 123).is_a?(A).should be_false
 
     B.new(id: 123).tick.should eq("called_tick")
+  end
+
+  it "supports type parameters" do
+    with_str = WithTypeParam(String).new("value")
+    typeof(with_str.field).should eq(String)
+
+    with_int = WithTypeParam(Int32).new(2)
+    typeof(with_int.field).should eq(Int32)
   end
 
   it "defines getters for each field" do
@@ -97,6 +107,7 @@ describe DataClass do
 
   it "defines a human friendly to_s method" do
     p.to_s.should eq("Person(Brian, 16)")
+    profile.to_s.should eq("Profile(Person(Brian, 16), Address(10 Strand, EC1))")
   end
 
   it "defines equality as structural comparison" do
