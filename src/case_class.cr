@@ -56,17 +56,20 @@ macro case_class(class_def)
 
     macro []=({% for key, idx in literal %}{{key.var}}_pattern,{% end %} rhs)
       begin
-        %extracted = {{literal.type}}.to_tuple(\{{rhs}})
+        {{literal.type}}.to_tuple(\{{rhs}}) && begin
 
-        if %extracted
-          {% for key, idx in literal %}
-            %rhs_{idx} = %extracted[{{idx}}]
+          {% if literal.size == 1 %}
+            %rhs_{0} = \{{rhs}}.as({{literal.type}}).to_tuple[0]
+          {% else %}
+            {% for key, idx in literal %}%rhs_{idx}{% if idx < literal.size - 1 %}, {% end %}{% end %} = \{{rhs}}.as({{literal.type}}).to_tuple
           {% end %}
 
           %is_match = true
 
           {% for key, idx in literal %}
             \{% if {{key.var}}_pattern.class_name == "Underscore" %}
+            \{% elsif {{key.var}}_pattern.class_name == "Var" %}
+              \{{ {{key.var}}_pattern }} = %rhs_{idx}
             \{% elsif {{key.var}}_pattern.class_name == "Call" %}
               \{% if {{key.var}}_pattern.name == "`" %}
                 %is_match = %is_match && \{{ {{key.var}}_pattern.args[0].id }} === %rhs_{idx}
@@ -80,7 +83,7 @@ macro case_class(class_def)
             \{% end %}
           {% end %}
 
-          %is_match
+          \{{rhs}}.as({{literal.type}}).to_tuple
         end
       end
     end
