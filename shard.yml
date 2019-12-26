@@ -1,5 +1,5 @@
 name: dataclass
-version: 1.0.0
+version: 1.1.0
 
 authors:
   - lbarasti
@@ -7,6 +7,6 @@ authors:
 description: |
   Data class macros for the Crystal Language.
 
-crystal: 0.31.1
+crystal: 0.32.1
 
 license: MIT
