@@ -15,10 +15,10 @@ macro dataclass(class_def)
       getter {{key.var}}
     {% end %}
 
-    def initialize({% for key in literal %}
-      @{{key}},
-    {% end %})
+    def initialize({{*literal.map { |key| "@#{key}".id }}})
     end
+
+    {{yield}}
 
     def_equals_and_hash({% for key in literal %}@{{key.var}},{% end %})
 

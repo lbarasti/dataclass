@@ -4,6 +4,7 @@
 
 
 # dataclass
+
 A [Crystal](http://crystal-lang.org/) macro to ease the definition of *data classes*, i.e. classes whose main purpose is to hold data.
 
 Data class instances are immutable, and provide a natural implementation for the most common methods.
@@ -74,6 +75,7 @@ p.copy(age: p.age + 1) # => Person(Rick, 29)
 
 
 ### Pattern-based parameter extraction
+
 Data classes enable you to extract parameters using some sort of pattern matching. This is powered by a custom definition of the `[]=` operator on the data class itself.
 
 For example, given the data classes
@@ -106,6 +108,7 @@ Skipping the initialization step will produce a compilation error as soon as you
 
 
 ### Destructuring assignment
+
 Data classes support destructuring assignment. There is no magic involved here: data classes simply implement the indexing operator `#[](idx)`.
 
 ```crystal
@@ -152,29 +155,64 @@ The `dataclass` macro supports type parameters, so the following code is valid
 dataclass Wrapper(T){value : T}
 ```
 
-### Under the hood
-The expression `dataclass Person{name : String, age : Int = 18}` is equivalent to the following:
+### Support for defining additional methods
+
+The `dataclass` macro supports defining additional methods on your data class. If you pass the dataclass macro a code block, the body of the code block will be pasted into body of the expanded class definition.
+
 ```crystal
-class Person
+dataclass Person{name : String} do
+  def hello
+    "Hello #{@name}"
+  end
+end
+
+Person.new("Matt").hello  # => "Hello Matt"
+```
+
+This also works in conjunction with inheritance.
+
+### Under the hood
+
+The `dataclass` macro expands such that following definitions are equivalent.
+
+```crystal
+dataclass Person{name : String, age : Int = 18} < OtherType do
+  def hello
+    "Hello #{@name}"
+  end
+end
+```
+
+```crystal
+class Person < OtherType
   getter(name)
   getter(age)
-  def initialize(name : String, age : Int = 18)
-    @name = name
-    @age = age
+
+  def initialize(@name : String, @age : Int = 18)
   end
+
+  def hello
+    "Hello #{@name}"
+  end
+
   def_equals_and_hash(@name, @age)
+
   def copy(name = @name, age = @age) : Person
     Person.new(name, age)
   end
+
   def [](idx)
     [@name, @age][idx]
   end
+
   def to_tuple
     {@name, @age}
   end
+
   def to_named_tuple
     {name: @name, age: @age}
   end
+
   def to_s(io)
     fields = [@name, @age]
     io << "#{self.class}(#{fields.join(", ")})"
@@ -183,6 +221,7 @@ end
 ```
 
 ### Known Limitations
+
 * dataclass definition must have *at least* one argument. This is by design. Use `class NoArgClass; end` instead.
 * trying to inherit from a data class will lead to a compilation error.
 ```crystal
@@ -190,15 +229,6 @@ dataclass A{id : String}
 dataclass B{id : String, extra : Int32} < A # => won't compile
 ```
 This is by design. Try defining your data classes so that they [inherit from a commmon abstract class](https://stackoverflow.com/a/12706475) instead.
-* dataclass definitions are body-free. If you want to define additonal methods on a data class, then just re-open the definition:
-
-```crystal
-dataclass YourClass{id : String}
-
-class YourClass
-  # additional methods here
-end
-```
 
 ## Development
 

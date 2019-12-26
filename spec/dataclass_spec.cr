@@ -13,6 +13,15 @@ end
 dataclass B{id : Int32} < A
 dataclass C{id : Int32}
 dataclass Compound{id : String, b : B, c : C}
+dataclass WithBlock{id : Int32} < A do
+  def foo
+    "bar"
+  end
+
+  def tick
+    "super: #{super}"
+  end
+end
 
 dataclass WithTypeParam(T){field : T}
 
@@ -161,5 +170,18 @@ describe DataClass do
       # do nothing
     else fail("should have matched the above")
     end
+  end
+
+  it "supports defining class bodies in blocks" do
+    WithBlock.new(id: 10).foo.should eq("bar")
+  end
+
+  it "supports inheritance with block" do
+    WithBlock.new(id: 10).is_a?(A).should eq(true)
+    WithBlock.new(id: 10).is_a?(B).should eq(false)
+  end
+
+  it "supports calling super from block" do
+    WithBlock.new(id: 10).tick.should eq("super: called_tick")
   end
 end
