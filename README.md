@@ -249,3 +249,4 @@ crystal tool expand -c <path/to/file.cr>:<line>:<col> <path/to/file.cr>
 ## Contributors
 
 - [lbarasti](https://github.com/lbarasti) - creator, maintainer
+- [Matthew Berry](https://github.com/mattrberry) - contributor
