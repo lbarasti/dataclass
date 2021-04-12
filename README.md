@@ -1,7 +1,6 @@
 [![GitHub release](https://img.shields.io/github/release/lbarasti/dataclass.svg)](https://github.com/lbarasti/dataclass/releases)
-[![Build Status](https://travis-ci.org/lbarasti/dataclass.svg?branch=master)](https://travis-ci.org/lbarasti/dataclass)
+![Build Status](https://github.com/lbarasti/dataclass/workflows/Crystal%20spec/badge.svg)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-
 
 # dataclass
 
@@ -228,7 +227,7 @@ end
 dataclass A{id : String}
 dataclass B{id : String, extra : Int32} < A # => won't compile
 ```
-This is by design. Try defining your data classes so that they [inherit from a commmon abstract class](https://stackoverflow.com/a/12706475) instead.
+This is by design. Try defining your data classes so that they [inherit from a common abstract class](https://stackoverflow.com/a/12706475) instead.
 
 ## Development
 
